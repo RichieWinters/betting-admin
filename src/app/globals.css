@@ -1,8 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #f5f5f5;
   --foreground: #171717;
+  --primary: #007AFF;
+  --success: #34C759;
+  --warning: #FF9500;
+  --error: #FF3B30;
+  --gray: #8E8E93;
 }
 
 @theme inline {
@@ -23,4 +28,37 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.RaLayout-content {
+  background-color: #f5f5f5;
+}
+
+.RaList-main {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.RaCreate-main,
+.RaEdit-main {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.MuiButton-containedPrimary {
+  background-color: #007AFF !important;
+}
+
+.MuiButton-containedPrimary:hover {
+  background-color: #0066DD !important;
+}
+
+.RaAppBar-toolbar {
+  background-color: #007AFF !important;
+}
+
+.MuiAppBar-root {
+  background-color: #007AFF !important;
 }
