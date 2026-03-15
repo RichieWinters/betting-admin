@@ -1,9 +1,10 @@
+import type { User, AuthResponse } from '@/types';
 import type {
-  User,
-  AuthResponse,
-  LoginRequest,
-  RegisterRequest,
-} from '@/types';
+  UserBetsReportParams,
+  AggregatedStatsReportParams,
+  ReportJobResponse,
+  ReportJobStatus,
+} from '@/types/reports';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
@@ -113,6 +114,54 @@ class ApiClient {
 
   async getBets(): Promise<any[]> {
     return this.request<any[]>('/bets');
+  }
+
+  async requestUserBetsReport(
+    params: UserBetsReportParams,
+  ): Promise<ReportJobResponse> {
+    return this.request<ReportJobResponse>('/reports/user-bets', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    });
+  }
+
+  async requestAggregatedStatsReport(
+    params: AggregatedStatsReportParams,
+  ): Promise<ReportJobResponse> {
+    return this.request<ReportJobResponse>('/reports/aggregated-stats', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    });
+  }
+
+  async getReportJobStatus(jobId: string): Promise<ReportJobStatus> {
+    return this.request<ReportJobStatus>(`/reports/${jobId}/status`);
+  }
+
+  async downloadReport(jobId: string): Promise<Blob> {
+    const token = this.getToken();
+    const headers: Record<string, string> = {};
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${this.baseUrl}/reports/${jobId}/download`, {
+      headers,
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({
+        message: response.statusText,
+      }));
+      throw {
+        status: response.status,
+        message: error.message || 'Download failed',
+        data: error,
+      };
+    }
+
+    return response.blob();
   }
 }
 
