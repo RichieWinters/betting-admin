@@ -8,6 +8,7 @@ import { MatchCreate } from "@/components/matches/MatchCreate";
 import { MatchEdit } from "@/components/matches/MatchEdit";
 import { BetList } from "@/components/bets/BetList";
 import { CustomLoginPage } from "@/components/auth/CustomLoginPage";
+import { ReportsPage } from "@/components/reports/ReportsPage";
 
 const AdminApp = () => (
   <Admin
@@ -53,6 +54,11 @@ const AdminApp = () => (
       name="bets"
       list={BetList}
       options={{ label: 'Bets' }}
+    />
+    <Resource
+      name="reports"
+      list={ReportsPage}
+      options={{ label: 'Reports' }}
     />
   </Admin>
 );
