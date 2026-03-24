@@ -31,7 +31,7 @@ export const authProvider: AuthProvider = {
   checkAuth: async () => {
     const token = getToken();
     if (!token) {
-      return Promise.reject();
+      return Promise.reject({ message: false });
     }
 
     try {
@@ -54,7 +54,7 @@ export const authProvider: AuthProvider = {
     } catch (error) {
       removeToken();
       localStorage.removeItem('user');
-      return Promise.reject();
+      return Promise.reject({ message: false });
     }
   },
 

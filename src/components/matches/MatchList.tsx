@@ -9,6 +9,7 @@ import {
   useRecordContext,
 } from 'react-admin';
 import { Match, Status, SportType } from '@/types';
+import { LocalizedDateField } from '@/components/common/LocalizedDateField';
 
 const StatusBadge = () => {
   const record = useRecordContext<Match>();
@@ -82,11 +83,11 @@ const TeamsField = () => {
 
 export const MatchList = () => (
   <List>
-    <Datagrid rowClick="edit">
+    <Datagrid rowClick="edit" bulkActionButtons={false}>
       <TextField source="id" />
       <FunctionField label="Sport" render={() => <SportBadge />} />
       <FunctionField label="Teams" render={() => <TeamsField />} />
-      <DateField source="date" showTime />
+      <FunctionField label="Date" render={() => <LocalizedDateField source="date" />} />
       <FunctionField label="Status" render={() => <StatusBadge />} />
       <TextField source="winner" emptyText="-" />
     </Datagrid>

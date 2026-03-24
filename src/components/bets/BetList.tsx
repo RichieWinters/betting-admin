@@ -10,6 +10,7 @@ import {
   useRecordContext,
 } from 'react-admin';
 import { Bet, Status } from '@/types';
+import { LocalizedDateField } from '@/components/common/LocalizedDateField';
 
 const UserNameField = () => {
   const record = useRecordContext<Bet>();
@@ -110,7 +111,7 @@ export const BetList = () => (
       />
       <FunctionField label="Match Status" render={() => <MatchStatusBadge />} />
       <FunctionField label="Result" render={() => <ResultBadge />} />
-      <DateField source="createdAt" showTime label="Placed At" />
+      <FunctionField label="Placed At" render={() => <LocalizedDateField source="createdAt" />} />
     </Datagrid>
   </List>
 );

@@ -8,11 +8,14 @@ import type {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
+console.log('API_URL configured as:', API_URL);
+
 class ApiClient {
   private baseUrl: string;
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl;
+    console.log('ApiClient initialized with baseUrl:', this.baseUrl);
   }
 
   private getToken(): string | null {

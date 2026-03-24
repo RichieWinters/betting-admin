@@ -3,6 +3,7 @@ import { io, Socket } from 'socket.io-client';
 import type { WebSocketStatusUpdate } from '@/types/reports';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const WEBSOCKET_URL = API_URL.replace('/api', '');
 
 interface UseReportWebSocketOptions {
   onStatusUpdate?: (update: WebSocketStatusUpdate) => void;
@@ -28,7 +29,8 @@ export const useReportWebSocket = (
   const initializeSocket = useCallback(() => {
     if (socketRef.current?.connected) return;
 
-    const socket = io(`${API_URL}/reports`, {
+    const socket = io(`${WEBSOCKET_URL}/reports`, {
+      path: '/socket.io',
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionDelay: 1000,

@@ -15,6 +15,7 @@ import {
   FunctionField,
 } from 'react-admin';
 import { User, Role } from '@/types';
+import { LocalizedDateField } from '@/components/common/LocalizedDateField';
 
 const BanActionButton = () => {
   const record = useRecordContext<User>();
@@ -108,7 +109,7 @@ export const UserList = () => (
         options={{ style: 'decimal', minimumFractionDigits: 2 }}
       />
       <FunctionField label="Status" render={() => <BannedBadge />} />
-      <DateField source="createdAt" showTime />
+      <FunctionField label="Created At" render={() => <LocalizedDateField source="createdAt" />} />
       <FunctionField label="Actions" render={() => <BanActionButton />} />
     </Datagrid>
   </List>

@@ -7,12 +7,14 @@ import {
   TextInput,
   required,
   useRecordContext,
+  Toolbar,
+  SaveButton,
 } from 'react-admin';
 import { Status } from '@/types';
 
 const WinnerInput = () => {
   const record = useRecordContext();
-  
+
   if (!record || record.status !== Status.COMPLETED) {
     return null;
   }
@@ -28,9 +30,15 @@ const WinnerInput = () => {
   );
 };
 
+const CustomToolbar = () => (
+  <Toolbar>
+    <SaveButton />
+  </Toolbar>
+);
+
 export const MatchEdit = () => (
   <Edit>
-    <SimpleForm>
+    <SimpleForm toolbar={<CustomToolbar />}>
       <SelectInput
         source="status"
         label="Match Status"

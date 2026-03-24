@@ -36,7 +36,7 @@ export const AggregatedStatsReportForm = () => {
 
   const handleCompletion = useCallback(() => {
     if (completedRef.current) return;
-    
+
     completedRef.current = true;
     stopPolling();
     setIsGenerating(false);
@@ -47,7 +47,7 @@ export const AggregatedStatsReportForm = () => {
 
   const handleFailure = useCallback((errorMsg: string) => {
     if (completedRef.current) return;
-    
+
     completedRef.current = true;
     stopPolling();
     setIsGenerating(false);
@@ -71,7 +71,7 @@ export const AggregatedStatsReportForm = () => {
 
   const startPolling = useCallback((currentJobId: string) => {
     stopPolling();
-    
+
     const interval = setInterval(async () => {
       if (completedRef.current) {
         stopPolling();
@@ -121,7 +121,7 @@ export const AggregatedStatsReportForm = () => {
 
       setJobId(response.jobId);
       subscribe(response.jobId);
-      
+
       startPolling(response.jobId);
     } catch (err: any) {
       setIsGenerating(false);
