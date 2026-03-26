@@ -1,7 +1,21 @@
 "use client";
 
 import { SubmitEvent, useState } from 'react';
-import { useLogin, useNotify, Notification } from 'react-admin';
+import { useLogin, useNotify } from 'react-admin';
+import { z } from 'zod';
+
+const loginSchema = z.object({
+  email: z
+    .string()
+    .includes('@', { message: 'Invalid email format' })
+    .max(50, { message: 'Email must be less than 50 characters' })
+    .regex(/^[^<>{}[\]\\]*$/, { message: 'Email contains invalid characters' }),
+  password: z
+    .string()
+    .min(1, { message: 'Password is required' })
+    .max(50, { message: 'Password must be less than 50 characters' })
+    .regex(/^[^<>{}[\]\\]*$/, { message: 'Password contains invalid characters' }),
+});
 
 export const CustomLoginPage = () => {
   const [email, setEmail] = useState('');
@@ -13,8 +27,11 @@ export const CustomLoginPage = () => {
   const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
 
-    if (!email || !password) {
-      notify('Please fill in all fields', { type: 'error' });
+    const result = loginSchema.safeParse({ email, password });
+
+    if (!result.success) {
+      const firstError = result.error.issues[0];
+      notify(firstError.message, { type: 'error' });
       return;
     }
 
@@ -29,7 +46,6 @@ export const CustomLoginPage = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Notification />
       <div className="w-full max-w-md p-8">
         <div className="bg-white rounded-xl shadow-sm p-8">
           <h1 className="text-3xl font-bold text-center mb-2">Admin Panel</h1>
@@ -45,6 +61,7 @@ export const CustomLoginPage = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
+                maxLength={50}
                 className="w-full h-12 px-4 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-60 disabled:bg-gray-50"
                 autoComplete="email"
               />
@@ -57,6 +74,7 @@ export const CustomLoginPage = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
+                maxLength={50}
                 className="w-full h-12 px-4 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-60 disabled:bg-gray-50"
                 autoComplete="current-password"
               />

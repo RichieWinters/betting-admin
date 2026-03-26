@@ -1,5 +1,5 @@
 "use client";
-import { Admin, Resource } from "react-admin";
+import { Admin, Resource, Notification } from "react-admin";
 import { authProvider } from "@/lib/authProvider";
 import { dataProvider } from "@/lib/dataProvider";
 import { UserList } from "@/components/users/UserList";
@@ -10,11 +10,16 @@ import { BetList } from "@/components/bets/BetList";
 import { CustomLoginPage } from "@/components/auth/CustomLoginPage";
 import { ReportsPage } from "@/components/reports/ReportsPage";
 
+const CustomNotification = () => (
+  <Notification anchorOrigin={{ vertical: 'top', horizontal: 'center' }} />
+);
+
 const AdminApp = () => (
   <Admin
     dataProvider={dataProvider}
     authProvider={authProvider}
     loginPage={CustomLoginPage}
+    notification={CustomNotification}
     theme={{
       palette: {
         primary: {
