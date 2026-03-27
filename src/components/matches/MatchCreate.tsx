@@ -11,7 +11,7 @@ import {
 import { SportType } from '@/types';
 
 export const MatchCreate = () => (
-  <Create>
+  <Create redirect="list">
     <SimpleForm>
       <DateTimeInput
         source="date"

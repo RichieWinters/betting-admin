@@ -45,6 +45,7 @@ export interface Bet {
   matchId: number;
   amount: number;
   team: string;
+  result: string;
   createdAt: string;
   updatedAt: string;
   user: {

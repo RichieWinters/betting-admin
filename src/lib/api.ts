@@ -115,6 +115,12 @@ class ApiClient {
     });
   }
 
+  async deleteMatch(id: number): Promise<any> {
+    return this.request<any>(`/matches/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
   async getBets(): Promise<any[]> {
     return this.request<any[]>('/bets');
   }

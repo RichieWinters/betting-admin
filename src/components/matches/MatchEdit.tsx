@@ -1,12 +1,14 @@
 "use client";
 
+import { useState, useEffect } from 'react';
 import {
   Edit,
   SimpleForm,
   SelectInput,
-  TextInput,
+  AutocompleteInput,
   required,
   useRecordContext,
+  useInput,
   Toolbar,
   SaveButton,
 } from 'react-admin';
@@ -14,18 +16,30 @@ import { Status } from '@/types';
 
 const WinnerInput = () => {
   const record = useRecordContext();
+  const { field: statusField } = useInput({ source: 'status' });
+  const [showWinner, setShowWinner] = useState(statusField.value === Status.COMPLETED);
 
-  if (!record || record.status !== Status.COMPLETED) {
+  useEffect(() => {
+    setShowWinner(statusField.value === Status.COMPLETED);
+  }, [statusField.value]);
+
+  if (!showWinner) {
     return null;
   }
 
+  const winnerChoices = [
+    { id: record?.teamA || '', name: record?.teamA || 'Team A' },
+    { id: record?.teamB || '', name: record?.teamB || 'Team B' },
+  ].filter(choice => choice.id);
+
   return (
-    <TextInput
+    <AutocompleteInput
       source="winner"
       label="Winner"
+      choices={winnerChoices}
       validate={[required()]}
       fullWidth
-      helperText="Enter the winning team name (must match Team A or Team B)"
+      helperText="Select or type the winner team"
     />
   );
 };

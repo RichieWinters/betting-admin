@@ -10,6 +10,7 @@ import {
 } from 'react-admin';
 import { Match, Status, SportType } from '@/types';
 import { LocalizedDateField } from '@/components/common/LocalizedDateField';
+import { MatchDeleteButton } from './MatchDeleteButton';
 
 const StatusBadge = () => {
   const record = useRecordContext<Match>();
@@ -90,6 +91,7 @@ export const MatchList = () => (
       <FunctionField label="Date" render={() => <LocalizedDateField source="date" />} />
       <FunctionField label="Status" render={() => <StatusBadge />} />
       <TextField source="winner" emptyText="-" />
+      <FunctionField label="Actions" render={() => <MatchDeleteButton />} />
     </Datagrid>
   </List>
 );

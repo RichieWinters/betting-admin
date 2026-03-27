@@ -74,7 +74,7 @@ const ResultBadge = () => {
   const record = useRecordContext<Bet>();
   if (!record) return null;
 
-  if (record.match.status !== Status.COMPLETED || !record.match.winner) {
+  if (!record.result) {
     return (
       <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">
         Pending
@@ -82,17 +82,16 @@ const ResultBadge = () => {
     );
   }
 
-  const isWin = record.match.winner === record.team;
+  const isWin = record.result.toLowerCase() === 'win';
 
   return (
     <span
-      className={`px-3 py-1 rounded-full text-xs font-semibold ${
-        isWin
+      className={`px-3 py-1 rounded-full text-xs font-semibold ${isWin
           ? 'bg-[#34C759] text-white'
           : 'bg-[#FF3B30] text-white'
-      }`}
+        }`}
     >
-      {isWin ? 'Won' : 'Lost'}
+      {record.result}
     </span>
   );
 };

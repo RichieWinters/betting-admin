@@ -155,7 +155,13 @@ export const dataProvider: DataProvider = {
   },
 
   delete: async (resource, params) => {
-    throw new Error('Delete not supported');
+    switch (resource) {
+      case 'matches':
+        const match = await apiClient.deleteMatch(params.id as number);
+        return { data: match };
+      default:
+        throw new Error(`Delete not supported for resource: ${resource}`);
+    }
   },
 
   deleteMany: async (resource, params) => {
