@@ -1,0 +1,86 @@
+# GitLab CI/CD — betting-admin (Next.js / standalone)
+#
+# Required CI/CD variables (Settings → CI/CD → Variables):
+#   SSH_PRIVATE_KEY      type: File, protected
+#   DEPLOY_HOST          type: Variable
+#   DEPLOY_USER          type: Variable
+#   NEXT_PUBLIC_API_URL  type: Variable
+#
+
+stages:
+  - lint
+  - test
+  - build
+  - deploy
+
+default:
+  image: node:20-bookworm-slim
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - node_modules/
+
+lint:
+  stage: lint
+  before_script:
+    - npm ci
+  script:
+    - npm run lint
+
+test:
+  stage: test
+  before_script:
+    - npm ci
+  script:
+    - echo "No tests defined yet"
+
+build:
+  stage: build
+  before_script:
+    - npm ci
+  script:
+    - npm run build
+  artifacts:
+    paths:
+      - dist/standalone/
+      - dist/static/
+      - ecosystem.config.js
+    expire_in: 1 day
+
+deploy:
+  stage: deploy
+  image: alpine:latest
+  cache: []
+  dependencies:
+    - build
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+  before_script:
+    - apk add --no-cache openssh-client rsync
+    - mkdir -p ~/.ssh && chmod 700 ~/.ssh
+    - cp "$SSH_PRIVATE_KEY" ~/.ssh/id_ci
+    - chmod 600 ~/.ssh/id_ci
+    - ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+  script:
+    # Next standalone expects static files at server/public and .next/static.
+    # Copy them into the expected locations inside the standalone tree before rsyncing.
+    - cp -r dist/static dist/standalone/.next/static
+    - cp -r public dist/standalone/public 2>/dev/null || true
+    - |
+      rsync -az --delete \
+        --exclude='.env' \
+        -e "ssh -i ~/.ssh/id_ci" \
+        dist/standalone/ ecosystem.config.js \
+        "$DEPLOY_USER@$DEPLOY_HOST:/home/$DEPLOY_USER/admin/"
+    - |
+      ssh -i ~/.ssh/id_ci "$DEPLOY_USER@$DEPLOY_HOST" 'bash -l -s' << 'ENDSSH'
+      set -e
+      export NVM_DIR="$HOME/.nvm"
+      [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
+      cd ~/admin
+      set -a && source .env && set +a
+      echo "server.js exists: $(test -f server.js && echo YES || echo NO)"
+      pm2 reload ecosystem.config.js --update-env || pm2 start ecosystem.config.js
+      ENDSSH
