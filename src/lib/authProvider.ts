@@ -15,9 +15,9 @@ export const authProvider: AuthProvider = {
       localStorage.setItem('user', JSON.stringify(response.user));
       
       return Promise.resolve();
-    } catch (error: any) {
+    } catch (error: unknown) {
       return Promise.reject(
-        new Error(error.message || 'Login failed. Please check your credentials.')
+        new Error(error instanceof Error ? error.message : 'Login failed. Please check your credentials.')
       );
     }
   },
@@ -51,7 +51,7 @@ export const authProvider: AuthProvider = {
 
       localStorage.setItem('user', JSON.stringify(user));
       return Promise.resolve();
-    } catch (error) {
+    } catch {
       removeToken();
       localStorage.removeItem('user');
       return Promise.reject({ message: false });

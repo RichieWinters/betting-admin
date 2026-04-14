@@ -1,6 +1,6 @@
 "use client";
 
-import { SubmitEvent, useState } from 'react';
+import { useState } from 'react';
 import { useLogin, useNotify } from 'react-admin';
 import { z } from 'zod';
 
@@ -24,7 +24,7 @@ export const CustomLoginPage = () => {
   const login = useLogin();
   const notify = useNotify();
 
-  const handleSubmit = async (e: SubmitEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const result = loginSchema.safeParse({ email, password });
@@ -38,8 +38,8 @@ export const CustomLoginPage = () => {
     setIsLoading(true);
     try {
       await login({ username: email, password });
-    } catch (error: any) {
-      notify(error.message || 'Login failed', { type: 'error' });
+    } catch (error: unknown) {
+      notify(error instanceof Error ? error.message : 'Login failed', { type: 'error' });
       setIsLoading(false);
     }
   };

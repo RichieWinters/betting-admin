@@ -38,8 +38,8 @@ export const MatchDeleteButton = () => {
       notify('Match deleted successfully. Pending bets have been refunded.', { type: 'success' });
       refresh();
       setOpen(false);
-    } catch (error: any) {
-      notify(error.message || 'Error deleting match', { type: 'error' });
+    } catch (error: unknown) {
+      notify(error instanceof Error ? error.message : 'Error deleting match', { type: 'error' });
       setOpen(false);
     }
   };

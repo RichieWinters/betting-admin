@@ -123,9 +123,9 @@ export const AggregatedStatsReportForm = () => {
       subscribe(response.jobId);
 
       startPolling(response.jobId);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setIsGenerating(false);
-      const errorMessage = err.message || 'Failed to generate report';
+      const errorMessage = err instanceof Error ? err.message : 'Failed to generate report';
       setError(errorMessage);
       notify(errorMessage, { type: 'error' });
     }
@@ -153,8 +153,8 @@ export const AggregatedStatsReportForm = () => {
       setJobId(null);
       setDownloadReady(false);
       setProgress(0);
-    } catch (err: any) {
-      const errorMessage = err.message || 'Failed to download report';
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to download report';
       setError(errorMessage);
       notify(errorMessage, { type: 'error' });
     }

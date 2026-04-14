@@ -64,9 +64,7 @@ deploy:
     - chmod 600 ~/.ssh/id_ci
     - ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
   script:
-    # Next standalone expects static files at server/public and .next/static.
-    # Copy them into the expected locations inside the standalone tree before rsyncing.
-    - cp -r dist/static dist/standalone/.next/static
+    - cp -r dist/static dist/standalone/dist/static
     - cp -r public dist/standalone/public 2>/dev/null || true
     - |
       rsync -az --delete \
@@ -82,5 +80,5 @@ deploy:
       cd ~/admin
       set -a && source .env && set +a
       echo "server.js exists: $(test -f server.js && echo YES || echo NO)"
-      pm2 reload ecosystem.config.js --update-env || pm2 start ecosystem.config.js
+      pm2 reload ecosystem.config.js --env production --update-env || pm2 start ecosystem.config.js --env production
       ENDSSH

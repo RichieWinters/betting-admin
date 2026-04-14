@@ -1,4 +1,4 @@
-import type { User, AuthResponse } from '@/types';
+import type { User, AuthResponse, Match, Bet } from '@/types';
 import type {
   UserBetsReportParams,
   AggregatedStatsReportParams,
@@ -97,32 +97,32 @@ class ApiClient {
     });
   }
 
-  async getMatches(): Promise<any[]> {
-    return this.request<any[]>('/matches');
+  async getMatches(): Promise<Match[]> {
+    return this.request<Match[]>('/matches');
   }
 
-  async createMatch(data: any): Promise<any> {
-    return this.request<any>('/matches', {
+  async createMatch(data: Partial<Match>): Promise<Match> {
+    return this.request<Match>('/matches', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
-  async updateMatch(id: number, data: any): Promise<any> {
-    return this.request<any>(`/matches/${id}`, {
+  async updateMatch(id: number, data: Partial<Match>): Promise<Match> {
+    return this.request<Match>(`/matches/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(data),
     });
   }
 
-  async deleteMatch(id: number): Promise<any> {
-    return this.request<any>(`/matches/${id}`, {
+  async deleteMatch(id: number): Promise<Match> {
+    return this.request<Match>(`/matches/${id}`, {
       method: 'DELETE',
     });
   }
 
-  async getBets(): Promise<any[]> {
-    return this.request<any[]>('/bets');
+  async getBets(): Promise<Bet[]> {
+    return this.request<Bet[]>('/bets');
   }
 
   async requestUserBetsReport(

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from 'react';
 import {
   Edit,
   SimpleForm,
@@ -17,11 +16,7 @@ import { Status } from '@/types';
 const WinnerInput = () => {
   const record = useRecordContext();
   const { field: statusField } = useInput({ source: 'status' });
-  const [showWinner, setShowWinner] = useState(statusField.value === Status.COMPLETED);
-
-  useEffect(() => {
-    setShowWinner(statusField.value === Status.COMPLETED);
-  }, [statusField.value]);
+  const showWinner = statusField.value === Status.COMPLETED;
 
   if (!showWinner) {
     return null;

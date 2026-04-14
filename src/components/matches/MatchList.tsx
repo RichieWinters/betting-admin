@@ -4,7 +4,6 @@ import {
   List,
   Datagrid,
   TextField,
-  DateField,
   FunctionField,
   useRecordContext,
 } from 'react-admin';

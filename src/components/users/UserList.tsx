@@ -6,8 +6,6 @@ import {
   TextField,
   EmailField,
   NumberField,
-  DateField,
-  BooleanField,
   useRecordContext,
   useDataProvider,
   useNotify,
@@ -39,8 +37,8 @@ const BanActionButton = () => {
         { type: 'success' }
       );
       refresh();
-    } catch (error: any) {
-      notify(error.message || 'Action failed', { type: 'error' });
+    } catch (error: unknown) {
+      notify(error instanceof Error ? error.message : 'Action failed', { type: 'error' });
     } finally {
       setLoading(false);
     }

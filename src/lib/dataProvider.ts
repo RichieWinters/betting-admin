@@ -1,170 +1,128 @@
-import { DataProvider } from 'react-admin';
+import type {
+  DataProvider,
+  GetListParams,
+  GetOneParams,
+  GetManyParams,
+  GetManyReferenceParams,
+  CreateParams,
+  UpdateParams,
+  UpdateManyParams,
+  DeleteParams,
+  DeleteManyParams,
+} from 'react-admin';
+import type { User, Match, Bet } from '@/types';
 import { apiClient } from './api';
 
-export const dataProvider: DataProvider = {
-  getList: async (resource, params) => {
-    let data: any[] = [];
+type AppRecord = User | Match | Bet;
 
-    switch (resource) {
-      case 'users':
-        data = await apiClient.getUsers();
-        break;
-      case 'matches':
-        data = await apiClient.getMatches();
-        break;
-      case 'bets':
-        data = await apiClient.getBets();
-        break;
-      default:
-        throw new Error(`Unknown resource: ${resource}`);
-    }
+async function fetchAll(resource: string): Promise<AppRecord[]> {
+  switch (resource) {
+    case 'users':
+      return apiClient.getUsers();
+    case 'matches':
+      return apiClient.getMatches();
+    case 'bets':
+      return apiClient.getBets();
+    default:
+      throw new Error(`Unknown resource: ${resource}`);
+  }
+}
+
+const dataProviderImpl = {
+  getList: async (resource: string, params: GetListParams) => {
+    const data = await fetchAll(resource);
 
     const { page = 1, perPage = 10 } = params.pagination || {};
     const { field, order } = params.sort || { field: 'id', order: 'ASC' };
 
-    let sortedData = [...data];
+    const sortedData = [...data];
     if (field) {
       sortedData.sort((a, b) => {
-        const aVal = a[field];
-        const bVal = b[field];
-        
+        const aVal = (a as unknown as Record<string, unknown>)[field];
+        const bVal = (b as unknown as Record<string, unknown>)[field];
+
         if (aVal === bVal) return 0;
         if (aVal == null) return 1;
         if (bVal == null) return -1;
-        
-        const comparison = aVal < bVal ? -1 : 1;
-        return order === 'ASC' ? comparison : -comparison;
+
+        return (aVal < bVal ? -1 : 1) * (order === 'ASC' ? 1 : -1);
       });
     }
 
     const start = (page - 1) * perPage;
-    const end = start + perPage;
-    const paginatedData = sortedData.slice(start, end);
+    const paginatedData = sortedData.slice(start, start + perPage);
 
-    return {
-      data: paginatedData,
-      total: data.length,
-    };
+    return { data: paginatedData, total: data.length };
   },
 
-  getOne: async (resource, params) => {
-    let data: any[] = [];
-
-    switch (resource) {
-      case 'users':
-        data = await apiClient.getUsers();
-        break;
-      case 'matches':
-        data = await apiClient.getMatches();
-        break;
-      case 'bets':
-        data = await apiClient.getBets();
-        break;
-      default:
-        throw new Error(`Unknown resource: ${resource}`);
-    }
-
-    const id = typeof params.id === 'string' ? parseInt(params.id, 10) : params.id;
-    const item = data.find((item) => item.id === id);
-    if (!item) {
-      throw new Error(`${resource} not found`);
-    }
-
+  getOne: async (resource: string, params: GetOneParams) => {
+    const data = await fetchAll(resource);
+    const id =
+      typeof params.id === 'string' ? parseInt(params.id, 10) : params.id;
+    const item = data.find((r) => r.id === id);
+    if (!item) throw new Error(`${resource} not found`);
     return { data: item };
   },
 
-  getMany: async (resource, params) => {
-    let data: any[] = [];
-
-    switch (resource) {
-      case 'users':
-        data = await apiClient.getUsers();
-        break;
-      case 'matches':
-        data = await apiClient.getMatches();
-        break;
-      case 'bets':
-        data = await apiClient.getBets();
-        break;
-      default:
-        throw new Error(`Unknown resource: ${resource}`);
-    }
-
-    const filteredData = data.filter((item) => params.ids.includes(item.id));
-    return { data: filteredData };
+  getMany: async (resource: string, params: GetManyParams) => {
+    const data = await fetchAll(resource);
+    return { data: data.filter((r) => params.ids.includes(r.id)) };
   },
 
-  getManyReference: async (resource, params) => {
-    let data: any[] = [];
-
-    switch (resource) {
-      case 'users':
-        data = await apiClient.getUsers();
-        break;
-      case 'matches':
-        data = await apiClient.getMatches();
-        break;
-      case 'bets':
-        data = await apiClient.getBets();
-        break;
-      default:
-        throw new Error(`Unknown resource: ${resource}`);
-    }
-
-    const filteredData = data.filter(
-      (item) => item[params.target] === params.id
+  getManyReference: async (
+    resource: string,
+    params: GetManyReferenceParams,
+  ) => {
+    const data = await fetchAll(resource);
+    const filtered = data.filter(
+      (r) =>
+        (r as unknown as Record<string, unknown>)[params.target] === params.id,
     );
-
-    return {
-      data: filteredData,
-      total: filteredData.length,
-    };
+    return { data: filtered, total: filtered.length };
   },
 
-  create: async (resource, params) => {
+  create: async (resource: string, params: CreateParams) => {
     switch (resource) {
       case 'matches':
-        const match = await apiClient.createMatch(params.data);
-        return { data: match };
+        return { data: await apiClient.createMatch(params.data) };
       default:
         throw new Error(`Create not supported for resource: ${resource}`);
     }
   },
 
-  update: async (resource, params) => {
+  update: async (resource: string, params: UpdateParams) => {
     switch (resource) {
       case 'users':
-        if (params.data.action === 'ban') {
-          const user = await apiClient.banUser(params.id as number);
-          return { data: user };
-        } else if (params.data.action === 'unban') {
-          const user = await apiClient.unbanUser(params.id as number);
-          return { data: user };
-        }
+        if (params.data.action === 'ban')
+          return { data: await apiClient.banUser(params.id as number) };
+        if (params.data.action === 'unban')
+          return { data: await apiClient.unbanUser(params.id as number) };
         throw new Error('Invalid user action');
       case 'matches':
-        const match = await apiClient.updateMatch(params.id as number, params.data);
-        return { data: match };
+        return {
+          data: await apiClient.updateMatch(params.id as number, params.data),
+        };
       default:
         throw new Error(`Update not supported for resource: ${resource}`);
     }
   },
 
-  updateMany: async (resource, params) => {
+  updateMany: async (_resource: string, _params: UpdateManyParams) => {
     throw new Error('updateMany not implemented');
   },
 
-  delete: async (resource, params) => {
+  delete: async (resource: string, params: DeleteParams) => {
     switch (resource) {
       case 'matches':
-        const match = await apiClient.deleteMatch(params.id as number);
-        return { data: match };
+        return { data: await apiClient.deleteMatch(params.id as number) };
       default:
         throw new Error(`Delete not supported for resource: ${resource}`);
     }
   },
 
-  deleteMany: async (resource, params) => {
+  deleteMany: async (_resource: string, _params: DeleteManyParams) => {
     throw new Error('deleteMany not supported');
   },
 };
+
+export const dataProvider = dataProviderImpl as unknown as DataProvider;

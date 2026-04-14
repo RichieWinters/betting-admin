@@ -15,7 +15,7 @@ import { useNotify } from 'react-admin';
 import { apiClient } from '@/lib/api';
 import { useReportWebSocket } from '@/hooks/useReportWebSocket';
 import type { User } from '@/types';
-import type { WebSocketStatusUpdate, JobStatus } from '@/types/reports';
+import type { WebSocketStatusUpdate } from '@/types/reports';
 
 export const UserBetsReportForm = () => {
   const notify = useNotify();
@@ -40,7 +40,7 @@ export const UserBetsReportForm = () => {
       try {
         const data = await apiClient.getUsers();
         setUsers(data);
-      } catch (err) {
+      } catch (_err) {
         notify('Failed to load users', { type: 'error' });
       } finally {
         setUsersLoading(false);
@@ -146,9 +146,9 @@ export const UserBetsReportForm = () => {
       subscribe(response.jobId);
 
       startPolling(response.jobId);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setIsGenerating(false);
-      const errorMessage = err.message || 'Failed to generate report';
+      const errorMessage = err instanceof Error ? err.message : 'Failed to generate report';
       setError(errorMessage);
       notify(errorMessage, { type: 'error' });
     }
@@ -176,8 +176,8 @@ export const UserBetsReportForm = () => {
       setJobId(null);
       setDownloadReady(false);
       setProgress(0);
-    } catch (err: any) {
-      const errorMessage = err.message || 'Failed to download report';
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to download report';
       setError(errorMessage);
       notify(errorMessage, { type: 'error' });
     }
